@@ -1,5 +1,5 @@
 import { Person } from '../types';
-import { LinkPerson, PersonLink } from './PersonLink';
+import { PersonLink } from './PersonLink';
 interface PeopleTableProps {
   people: Person[];
   selectedName: string | null;
@@ -9,6 +9,14 @@ export const PeopleTable: React.FC<PeopleTableProps> = ({
   people,
   selectedName,
 }) => {
+  const findPersonByName = (name: string | null | undefined) => {
+    if (!name) {
+      return null;
+    }
+
+    return people.find(p => p.name === name) || null;
+  };
+
   return (
     <table
       data-cy="peopleTable"
@@ -29,6 +37,9 @@ export const PeopleTable: React.FC<PeopleTableProps> = ({
         {people.map(person => {
           const isSelected = person.name === selectedName;
 
+          const motherDetails = findPersonByName(person.motherName);
+          const fatherDetails = findPersonByName(person.fatherName);
+
           return (
             <tr
               data-cy="person"
@@ -45,34 +56,20 @@ export const PeopleTable: React.FC<PeopleTableProps> = ({
               <td>
                 {!person.motherName ? (
                   '-'
+                ) : motherDetails ? (
+                  <PersonLink person={motherDetails} />
                 ) : (
-                  <PersonLink
-                    person={
-                      {
-                        name: person.motherName,
-                        sex: 'f',
-                        born: undefined,
-                      } as LinkPerson
-                    }
-                    isParentLink={true}
-                  />
+                  person.motherName
                 )}
               </td>
 
               <td>
                 {!person.fatherName ? (
                   '-'
+                ) : fatherDetails ? (
+                  <PersonLink person={fatherDetails} />
                 ) : (
-                  <PersonLink
-                    person={
-                      {
-                        name: person.fatherName,
-                        sex: 'f',
-                        born: undefined,
-                      } as LinkPerson
-                    }
-                    isParentLink={true}
-                  />
+                  person.fatherName
                 )}
               </td>
             </tr>
