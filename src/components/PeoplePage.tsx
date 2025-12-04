@@ -3,11 +3,14 @@ import { Loader } from './Loader';
 import { PeopleTable } from './PeopleTable';
 import { Person } from '../types';
 import { getPeople } from '../api';
+import { useParams } from 'react-router-dom';
 
 export const PeoplePage: React.FC = () => {
   const [people, setPeople] = useState<Person[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
+
+  const { slug } = useParams<{ slug: string }>();
 
   useEffect(() => {
     const loadPeople = async () => {
@@ -28,6 +31,14 @@ export const PeoplePage: React.FC = () => {
     loadPeople();
   }, []);
 
+  const selectedPerson = people?.find(person => {
+    const personSlug = `${person.name.replace(/\s+/g, '-').toLowerCase()}-${person.born}`;
+
+    return personSlug === slug;
+  });
+
+  const selectedName = selectedPerson ? selectedPerson.name : null;
+
   return (
     <>
       <h1 className="title">People Page</h1>
@@ -46,7 +57,7 @@ export const PeoplePage: React.FC = () => {
           )}
 
           {!isLoading && !hasError && !!people?.length && (
-            <PeopleTable people={people} />
+            <PeopleTable people={people} selectedName={selectedName} />
           )}
         </div>
       </div>
